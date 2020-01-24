@@ -2,6 +2,7 @@ sudo: required
 dist: xenial
 
 os: linux
+arch: s390x
 
 language: c
 
@@ -16,6 +17,8 @@ addons:
     - dos2unix
     - cpanminus
     - libgd-dev
+    - libpcre3
+    - libpcre3-dev
 
 cache:
   directories:
@@ -39,14 +42,14 @@ env:
 
 install:
   - sudo cpanm --notest Test::Nginx IPC::Run3 > build.log 2>&1 || (cat build.log && exit 1)
-  - if [ ! -f download-cache/pcre-$PCRE_VER.tar.gz ]; then wget -P download-cache http://ftp.cs.stanford.edu/pub/exim/pcre/pcre-$PCRE_VER.tar.gz; fi
+#  - if [ ! -f download-cache/pcre-$PCRE_VER.tar.gz ]; then wget -P download-cache http://ftp.cs.stanford.edu/pub/exim/pcre/pcre-$PCRE_VER.tar.gz; fi
   - if [ ! -f download-cache/openssl-$OPENSSL_VER.tar.gz ]; then wget -P download-cache https://www.openssl.org/source/openssl-$OPENSSL_VER.tar.gz; fi
-  - tar zxf download-cache/pcre-$PCRE_VER.tar.gz
-  - cd pcre-$PCRE_VER/
-  - ./configure --prefix=$PCRE_PREFIX --enable-jit --enable-utf --enable-unicode-properties > build.log 2>&1 || (cat build.log && exit 1)
-  - make -j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
-  - sudo PATH=$PATH make install > build.log 2>&1 || (cat build.log && exit 1)
-  - cd ..
+#  - tar zxf download-cache/pcre-$PCRE_VER.tar.gz
+#  - cd pcre-$PCRE_VER/
+#  - ./configure --prefix=$PCRE_PREFIX --enable-jit --enable-utf --enable-unicode-properties > build.log 2>&1 || (cat build.log && exit 1)
+#  - make -j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
+#  - sudo PATH=$PATH make install > build.log 2>&1 || (cat build.log && exit 1)
+#  - cd ..
   - tar zxf download-cache/openssl-$OPENSSL_VER.tar.gz
   - cd openssl-$OPENSSL_VER/
   - patch -p1 < ../patches/openssl-$OPENSSL_PATCH_VER-sess_set_get_cb_yield.patch
