@@ -2,7 +2,7 @@ sudo: required
 dist: xenial
 
 os: linux
-arch: s390x
+#arch: s390x
 
 language: c
 
@@ -53,18 +53,18 @@ install:
   - tar zxf download-cache/openssl-$OPENSSL_VER.tar.gz
   - cd openssl-$OPENSSL_VER/
   - patch -p1 < ../patches/openssl-$OPENSSL_PATCH_VER-sess_set_get_cb_yield.patch
-  - ./config no-threads shared enable-ssl3 enable-ssl3-method -g --prefix=$OPENSSL_PREFIX -DPURIFY > build.log 2>&1 || (cat build.log && exit 1)
-  - make -j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
-  - sudo make PATH=$PATH install_sw > build.log 2>&1 || (cat build.log && exit 1)
+  - ./config no-threads shared enable-ssl3 enable-ssl3-method -g --prefix=$OPENSSL_PREFIX -DPURIFY #> build.log 2>&1 || (cat build.log && exit 1)
+  - make -j$JOBS #> build.log 2>&1 || (cat build.log && exit 1)
+  - sudo make PATH=$PATH install_sw #> build.log 2>&1 || (cat build.log && exit 1)
   - cd ..
   - sudo ln -s /usr/bin/make /usr/bin/gmake
 
 script:
   - util/mirror-tarballs > build.log 2>&1 || (cat build.log && exit 1)
   - cd openresty-*
-  - ./configure --prefix=$OPENRESTY_PREFIX --with-cc-opt="-I$PCRE_INC -I$OPENSSL_INC" --with-ld-opt="-L$PCRE_LIB -L$OPENSSL_LIB -Wl,-rpath,$PCRE_LIB:$OPENSSL_LIB" --with-pcre-jit --with-http_ssl_module --with-debug -j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
-  - make -j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
-  - sudo make install > build.log 2>&1 || (cat build.log && exit 1)
+  - ./configure --prefix=$OPENRESTY_PREFIX --with-cc-opt="-I$PCRE_INC -I$OPENSSL_INC" --with-ld-opt="-L$PCRE_LIB -L$OPENSSL_LIB -Wl,-rpath,$PCRE_LIB:$OPENSSL_LIB" --with-pcre-jit --with-http_ssl_module --with-debug -j$JOBS #> build.log 2>&1 || (cat build.log && exit 1)
+  - make -j$JOBS #> build.log 2>&1 || (cat build.log && exit 1)
+  - sudo make install #> build.log 2>&1 || (cat build.log && exit 1)
   - cd ..
   - export PATH=$OPENRESTY_PREFIX/bin:$OPENRESTY_PREFIX/nginx/sbin:$PATH
   - nginx -V
