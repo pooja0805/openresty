@@ -2,7 +2,7 @@ sudo: required
 dist: bionic
 
 os: linux
-arch: ppcle
+arch: s390x
 
 language: c
 
@@ -36,9 +36,11 @@ env:
     - OPENSSL_INC=$OPENSSL_PREFIX/include
     - OPENRESTY_PREFIX=/opt/openresty
   matrix:
-    - OPENSSL_VER=1.0.2q OPENSSL_PATCH_VER=1.0.2h
+#    - OPENSSL_VER=1.0.2q OPENSSL_PATCH_VER=1.0.2h
 #    - OPENSSL_VER=1.1.0j OPENSSL_PATCH_VER=1.1.0d
 #    - OPENSSL_VER=1.1.1c OPENSSL_PATCH_VER=1.1.1c
+     - OPENSSL_VER=1.1.1d OPENSSL_PATCH_VER=1.1.1d
+
 
 install:
   - sudo cpanm --notest Test::Nginx IPC::Run3 > build.log 2>&1 || (cat build.log && exit 1)
