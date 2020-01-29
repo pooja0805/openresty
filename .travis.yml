@@ -69,6 +69,7 @@ script:
   - sed -i '733,776s/.*/#&/' configure
   - sed -i '723s/.*/#&/' configure
   - sed -i '708,717s/.*/#&/' configure
+  - cat configure
   - ./configure --prefix=$OPENRESTY_PREFIX --with-cc-opt="-I$PCRE_INC -I$OPENSSL_INC" --with-ld-opt="-L$PCRE_LIB -L$OPENSSL_LIB -Wl,-rpath,$PCRE_LIB:$OPENSSL_LIB" --with-pcre-jit --with-http_ssl_module --with-debug -j$JOBS #> build.log 2>&1 || (cat build.log && exit 1)
   - make #-j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
   - sudo make install #> build.log 2>&1 || (cat build.log && exit 1)
@@ -84,5 +85,5 @@ script:
   - sed -i "s/ XCFLAGS='-msse4.2'//g" t/000-sanity.t
   #- sed -i "s/ -msse4.2//g" t/000-sanity.t
   - sed -i "s/-msse4.2//g" t/000-sanity.t
-  - cat t/000-sanity.t
+  #- cat t/000-sanity.t
   - prove -r t/
