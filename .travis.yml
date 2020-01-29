@@ -82,7 +82,7 @@ script:
   - sed -i "s/INFO: found -msse4.2 in cc.//" t/000-sanity.t
   - sed -i "s/WARNING: -msse4.2//" t/000-sanity.t
   - sed -i "s/ XCFLAGS='-msse4.2'//g" t/000-sanity.t
-  #- sed -i "s/ -msse4.2//g" t/000-sanity.t
+  - sed -i "s/ -msse4.2//g" t/000-sanity.t
   - sed -i "s/-msse4.2//g" t/000-sanity.t
   #- cat t/000-sanity.t
   - prove -r t/
