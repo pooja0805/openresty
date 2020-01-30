@@ -80,8 +80,8 @@ script:
   - sed -i "s@export LIBPQ_INC='(?:/usr/include|.*@export LIBPQ_INC='(?:/usr/include|/usr/include/postgresql|/usr/include/pgsql)'@" t/000-sanity.t
   - sed -i "/.*found -msse4.2 in cc./d" t/000-sanity.t
   - sed -i "/.*-msse4.2 not supported/d" t/000-sanity.t
-  - sed -i '/Can't exec "cl". No such file or directory/d' t/000-sanity.t
-  - sed -i '/Can't exec "gcc-4.2". No such file or directory/d' t/000-sanity.t
+  - sed -i '/Can't exec \"cl\". No such file or directory/d' t/000-sanity.t
+  - sed -i '/Can't exec \"gcc-4.2\". No such file or directory/d' t/000-sanity.t
   - sed -i "s/ XCFLAGS='-msse4.2'//g" t/000-sanity.t
   - sed -i "s/ -msse4.2//g" t/000-sanity.t
   - sed -i "s/-msse4.2 //g" t/000-sanity.t
