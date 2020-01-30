@@ -21,8 +21,6 @@ linux-s390x: &linux-s390x
   os: linux
   arch: s390x
   dist: xenial
-  env:
-      - OS_NAME="linux-s390x"
   addons:
       apt:
           update: true
@@ -90,6 +88,6 @@ script:
   - export PATH=$OPENRESTY_PREFIX/bin:$OPENRESTY_PREFIX/nginx/sbin:$PATH
   - nginx -V
   - ldd `which nginx`|grep -E 'luajit|ssl|pcre'
-  - if [ ! "${OS_NAME}" == "linux-s390x" ]; then
+  - if [ ! "$TRAVIS_ARCH" == "s390x" ]; then
       prove -r t/
     fi;
