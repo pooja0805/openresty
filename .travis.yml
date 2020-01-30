@@ -67,7 +67,6 @@ jobs:
           env: OPENSSL_VER=1.1.1c OPENSSL_PATCH_VER=1.1.1c       
           
 install:
-  - echo $JOBS
   - sudo cpanm --notest Test::Nginx IPC::Run3 > build.log 2>&1 || (cat build.log && exit 1)
   - if [ ! "$TRAVIS_ARCH" == "s390x" ] && [ ! -f download-cache/pcre-$PCRE_VER.tar.gz ]; then wget -P download-cache http://ftp.cs.stanford.edu/pub/exim/pcre/pcre-$PCRE_VER.tar.gz; fi
   - if [ ! -f download-cache/openssl-$OPENSSL_VER.tar.gz ]; then wget -P download-cache https://www.openssl.org/source/openssl-$OPENSSL_VER.tar.gz; fi
