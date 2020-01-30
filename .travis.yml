@@ -2,13 +2,12 @@ sudo: required
 dist: xenial
 
 os: linux
-arch: s390x
 
 language: c
 
 compiler:
   - gcc
- # - clang
+  - clang
 
 addons:
   apt:
@@ -17,11 +16,26 @@ addons:
     - dos2unix
     - cpanminus
     - libgd-dev
-    - libpcre3
-    - libpcre3-dev
-    - mercurial
-    - libpq-dev
-
+    
+linux-s390x: &linux-s390x
+  os: linux
+  arch: s390x
+  dist: xenial
+  env:
+      - OS_NAME="linux-s390x"
+  addons:
+      apt:
+          update: true
+          packages:
+            - axel
+            - dos2unix
+            - cpanminus
+            - libgd-dev
+            - libpcre3 
+            - libpcre3-dev 
+            - mercurial 
+            - libpq-dev
+            
 cache:
   directories:
   - download-cache
@@ -41,50 +55,41 @@ env:
     - OPENSSL_VER=1.0.2q OPENSSL_PATCH_VER=1.0.2h
     - OPENSSL_VER=1.1.0j OPENSSL_PATCH_VER=1.1.0d
     - OPENSSL_VER=1.1.1c OPENSSL_PATCH_VER=1.1.1c
-#     - OPENSSL_VER=1.1.1d OPENSSL_PATCH_VER=1.1.1d
 
-
+jobs:
+    include:
+        - <<: *linux-s390x
+          compiler: gcc
+          
 install:
   - sudo cpanm --notest Test::Nginx IPC::Run3 > build.log 2>&1 || (cat build.log && exit 1)
-#  - if [ ! -f download-cache/pcre-$PCRE_VER.tar.gz ]; then wget -P download-cache http://ftp.cs.stanford.edu/pub/exim/pcre/pcre-$PCRE_VER.tar.gz; fi
+  - if [ ! -f download-cache/pcre-$PCRE_VER.tar.gz ]; then wget -P download-cache http://ftp.cs.stanford.edu/pub/exim/pcre/pcre-$PCRE_VER.tar.gz; fi
   - if [ ! -f download-cache/openssl-$OPENSSL_VER.tar.gz ]; then wget -P download-cache https://www.openssl.org/source/openssl-$OPENSSL_VER.tar.gz; fi
-#  - tar zxf download-cache/pcre-$PCRE_VER.tar.gz
-#  - cd pcre-$PCRE_VER/
-#  - ./configure --prefix=$PCRE_PREFIX --enable-jit --enable-utf --enable-unicode-properties > build.log 2>&1 || (cat build.log && exit 1)
-#  - make -j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
-#  - sudo PATH=$PATH make install > build.log 2>&1 || (cat build.log && exit 1)
-#  - cd ..
+  - tar zxf download-cache/pcre-$PCRE_VER.tar.gz
+  - cd pcre-$PCRE_VER/
+  - ./configure --prefix=$PCRE_PREFIX --enable-jit --enable-utf --enable-unicode-properties > build.log 2>&1 || (cat build.log && exit 1)
+  - make -j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
+  - sudo PATH=$PATH make install > build.log 2>&1 || (cat build.log && exit 1)
+  - cd ..
   - tar zxf download-cache/openssl-$OPENSSL_VER.tar.gz
   - cd openssl-$OPENSSL_VER/
   - patch -p1 < ../patches/openssl-$OPENSSL_PATCH_VER-sess_set_get_cb_yield.patch
-  - ./config no-threads shared enable-ssl3 enable-ssl3-method -g --prefix=$OPENSSL_PREFIX -DPURIFY #> build.log 2>&1 || (cat build.log && exit 1)
-  - make -j$JOBS #> build.log 2>&1 || (cat build.log && exit 1)
-  - sudo make PATH=$PATH install_sw #> build.log 2>&1 || (cat build.log && exit 1)
+  - ./config no-threads shared enable-ssl3 enable-ssl3-method -g --prefix=$OPENSSL_PREFIX -DPURIFY > build.log 2>&1 || (cat build.log && exit 1)
+  - make -j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
+  - sudo make PATH=$PATH install_sw > build.log 2>&1 || (cat build.log && exit 1)
   - cd ..
   - sudo ln -s /usr/bin/make /usr/bin/gmake
 
 script:
   - util/mirror-tarballs > build.log 2>&1 || (cat build.log && exit 1)
   - cd openresty-*
-  - ./configure --prefix=$OPENRESTY_PREFIX --with-cc-opt="-I$PCRE_INC -I$OPENSSL_INC" --with-ld-opt="-L$PCRE_LIB -L$OPENSSL_LIB -Wl,-rpath,$PCRE_LIB:$OPENSSL_LIB" --with-pcre-jit --with-http_ssl_module --with-debug -j$JOBS #> build.log 2>&1 || (cat build.log && exit 1)
-  - make -j$JOBS #> build.log 2>&1 || (cat build.log && exit 1)
-  - sudo make install #> build.log 2>&1 || (cat build.log && exit 1)
+  - ./configure --prefix=$OPENRESTY_PREFIX --with-cc-opt="-I$PCRE_INC -I$OPENSSL_INC" --with-ld-opt="-L$PCRE_LIB -L$OPENSSL_LIB -Wl,-rpath,$PCRE_LIB:$OPENSSL_LIB" --with-pcre-jit --with-http_ssl_module --with-debug -j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
+  - make -j$JOBS > build.log 2>&1 || (cat build.log && exit 1)
+  - sudo make install > build.log 2>&1 || (cat build.log && exit 1)
   - cd ..
   - export PATH=$OPENRESTY_PREFIX/bin:$OPENRESTY_PREFIX/nginx/sbin:$PATH
   - nginx -V
   - ldd `which nginx`|grep -E 'luajit|ssl|pcre'
-#  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then 
-#      if [ "$TRAVIS_ARCH" = "s390x" ]; then 
-#        sed -i "s@export LIBPQ_LIB='(/usr/lib64.*@export LIBPQ_LIB='(/usr/lib64|/usr/lib/s390x-linux-gnu|/usr/lib/postgresql10/lib64)'@" t/000-sanity.t; 
-#        sed -i "s@export LIBPQ_INC='(?:/usr/include|.*@export LIBPQ_INC='(?:/usr/include|/usr/include/postgresql|/usr/include/pgsql)'@" t/000-sanity.t;
-#        sed -i "/.*found -msse4.2 in cc./d" t/000-sanity.t;
-#        sed -i "/.*-msse4.2 not supported/d" t/000-sanity.t;
-#        sed -i '/Can't exec \"cl\". No such file or directory/d' t/000-sanity.t;
-#        sed -i '/Can't exec \"gcc-4.2\". No such file or directory/d' t/000-sanity.t;
-#        sed -i "s/ XCFLAGS='-msse4.2'//g" t/000-sanity.t;
-#        sed -i "s/ -msse4.2//g" t/000-sanity.t;
-#        sed -i "s/-msse4.2 //g" t/000-sanity.t;
-#        sed -i "s/-msse4.2//g" t/000-sanity.t;
-#      fi;
-#    fi
-#  - prove -r t/
+  - if [ ! "${OS_NAME}" == "linux-s390x" ]; then
+      prove -r t/
+    fi;
