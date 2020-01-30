@@ -78,9 +78,8 @@ script:
   - ldd `which nginx`|grep -E 'luajit|ssl|pcre'
   - sed -i "s@export LIBPQ_LIB='(/usr/lib64.*@export LIBPQ_LIB='(/usr/lib64|/usr/lib/s390x-linux-gnu|/usr/lib/postgresql10/lib64)'@" t/000-sanity.t
   - sed -i "s@export LIBPQ_INC='(?:/usr/include|.*@export LIBPQ_INC='(?:/usr/include|/usr/include/postgresql|/usr/include/pgsql)'@" t/000-sanity.t
-  #- sed -i "/exec \"gcc-4\.2\"\: No such file or directory/d" t/000-sanity.t
-  - sed -i "s/INFO: found -msse4.2 in cc.//" t/000-sanity.t
-  - sed -i "s/WARNING: -msse4.2//" t/000-sanity.t
+  - sed -i "s/.*found -msse4.2 in cc.//g" t/000-sanity.t
+  - sed -i "s/WARNING: -msse4.2//g" t/000-sanity.t
   - sed -i "s/ XCFLAGS='-msse4.2'//g" t/000-sanity.t
   - sed -i "s/ -msse4.2//g" t/000-sanity.t
   - sed -i "s/-msse4.2//g" t/000-sanity.t
