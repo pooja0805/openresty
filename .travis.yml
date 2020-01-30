@@ -79,9 +79,10 @@ script:
   - sed -i "s@export LIBPQ_LIB='(/usr/lib64.*@export LIBPQ_LIB='(/usr/lib64|/usr/lib/s390x-linux-gnu|/usr/lib/postgresql10/lib64)'@" t/000-sanity.t
   - sed -i "s@export LIBPQ_INC='(?:/usr/include|.*@export LIBPQ_INC='(?:/usr/include|/usr/include/postgresql|/usr/include/pgsql)'@" t/000-sanity.t
   - sed -i "/.*found -msse4.2 in cc./d" t/000-sanity.t
-#  - sed -i "s/WARNING: -msse4.2/dg" t/000-sanity.t
+  - sed -i "/.*-msse4.2 not supported/d" t/000-sanity.t
   - sed -i "s/ XCFLAGS='-msse4.2'//g" t/000-sanity.t
   - sed -i "s/ -msse4.2//g" t/000-sanity.t
+  - sed -i "s/-msse4.2 //g" t/000-sanity.t
   - sed -i "s/-msse4.2//g" t/000-sanity.t
   #- cat t/000-sanity.t
   - prove -r t/
