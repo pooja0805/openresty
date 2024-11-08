@@ -51,7 +51,7 @@ env:
 
 install:
   - cpanm --sudo --notest Test::Nginx IPC::Run3 > build.log 2>&1 || (cat build.log && exit 1)
-  - if [ "$(uname -m)" != "s390x" ]; then
+  - if [ "$TRAVIS_CPU_ARCH" != "s390x" ]; then
       {
         if [ ! -f download-cache/pcre-$PCRE_VER.tar.gz ]; then wget -P download-cache https://downloads.sourceforge.net/project/pcre/pcre/${PCRE_VER}/pcre-${PCRE_VER}.tar.gz; fi
         tar zxf download-cache/pcre-$PCRE_VER.tar.gz
