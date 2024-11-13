@@ -3,6 +3,7 @@ dist: focal
 branches:
   only:
     - "master"
+    - "s390x-patch_Travis"
 
 os: linux
 arch:
